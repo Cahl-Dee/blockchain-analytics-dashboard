@@ -4,6 +4,8 @@ const FUNCTION_ID = "761745fb-7401-45d2-b7b6-44f4cbb3f386";
 const API_URL = `https://api.quicknode.com/functions/rest/v1/functions/${FUNCTION_ID}/call?result_only=true`;
 
 export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const chain = searchParams.get("chain") || "base";
   const apiKey = process.env.QUICKNODE_API_KEY;
 
   if (!apiKey) {
@@ -16,7 +18,7 @@ export async function GET(request: Request) {
 
   const requestBody = {
     user_data: {
-      chain: "base",
+      chain: chain,
       days: 30,
     },
   };

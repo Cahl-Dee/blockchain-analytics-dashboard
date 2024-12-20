@@ -47,10 +47,10 @@ export interface DebugDataResponse {
   };
 }
 
-export async function fetchDebugData(): Promise<DebugDataResponse> {
-  const response = await fetch("/api/debug-data");
+export async function fetchDebugData(chain: string = "base"): Promise<any> {
+  const response = await fetch(`/api/debug-data?chain=${chain}`);
   if (!response.ok) {
-    throw new Error(`Failed to fetch debug data: ${response.statusText}`);
+    throw new Error("Failed to fetch debug data");
   }
   return response.json();
 }
