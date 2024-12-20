@@ -20,6 +20,7 @@ export async function GET(request: Request) {
     user_data: {
       chain: chain,
       days: 30,
+      method: "getHistoricalMetrics",
     },
   };
 
