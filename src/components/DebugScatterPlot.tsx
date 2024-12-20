@@ -28,6 +28,8 @@ export function DebugScatterPlot({ data }: DebugScatterPlotProps) {
     numBlocks: point.numBlocks,
     numFailedBlocks: point.numFailedBlocks,
     isSequentialWithNextDay: point.isSequentialWithNextDay,
+    // Add size property based on number of blocks
+    size: Math.max(Math.min(point.numBlocks / 1000, 800), 100), // Scale size between 100-800
   }));
 
   // Get min and max dates from lastUpdated timestamps
