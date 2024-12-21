@@ -18,10 +18,18 @@ interface DebugDataPoint {
 }
 
 interface DebugScatterPlotProps {
-  data: DebugDataPoint[];
+  data?: DebugDataPoint[];
 }
 
-export function DebugScatterPlot({ data }: DebugScatterPlotProps) {
+export function DebugScatterPlot({ data = [] }: DebugScatterPlotProps) {
+  if (!data || data.length === 0) {
+    return (
+      <div className="w-full h-[800px] bg-white p-4 rounded-lg shadow flex items-center justify-center">
+        <p>No data available</p>
+      </div>
+    );
+  }
+
   const formattedData = data.map((point) => ({
     date: point.date,
     lastUpdated: new Date(point.lastUpdated).getTime(),
@@ -50,7 +58,10 @@ export function DebugScatterPlot({ data }: DebugScatterPlotProps) {
   // Sort ticks chronologically
   const tickValues = dailyTicks.sort((a, b) => a - b);
 
-  const getPointColor = (point: any) => {
+  const getPointColor = (point: {
+    numFailedBlocks: number;
+    isSequentialWithNextDay: boolean;
+  }) => {
     return point.numFailedBlocks > 0 || point.isSequentialWithNextDay === false
       ? "#ff0000" // red
       : "#0000ff"; // blue

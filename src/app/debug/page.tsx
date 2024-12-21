@@ -3,11 +3,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DebugScatterPlot } from "@/components/DebugScatterPlot";
-import { fetchDebugData } from "@/services/api";
+import {
+  fetchDebugDataProcessedDays,
+  fetchDebugDataCurrentlyProcessing,
+  DebugDataProcessedDaysPoint,
+  DebugDataCurrentlyProcesing,
+} from "@/services/api";
 import { chains } from "@/config/chains";
 
 export default function Home() {
-  const [data, setData] = useState([]);
+  const [processedDays, setProcessedDays] = useState<
+    DebugDataProcessedDaysPoint[]
+  >([]);
+  const [currentlyProcessing, setCurrentlyProcessing] =
+    useState<DebugDataCurrentlyProcesing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedChain, setSelectedChain] = useState("base");
@@ -16,8 +25,12 @@ export default function Home() {
     const loadData = async () => {
       setLoading(true);
       try {
-        const result = await fetchDebugData(selectedChain);
-        setData(result.data);
+        const [processedDaysResp, currentlyProcessingResp] = await Promise.all([
+          fetchDebugDataProcessedDays(selectedChain),
+          fetchDebugDataCurrentlyProcessing(selectedChain),
+        ]);
+        setProcessedDays(processedDaysResp.data);
+        setCurrentlyProcessing(currentlyProcessingResp);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -56,8 +69,46 @@ export default function Home() {
             ))}
           </select>
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-semibold text-gray-500">
+              Currently Processing
+            </h3>
+            <p className="text-2xl font-bold">
+              Date: {currentlyProcessing?.date}
+            </p>
+            <p className="text-sm text-gray-600">
+              Completed Blocks:{" "}
+              {currentlyProcessing?.blocksProcessed.toLocaleString()}
+            </p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-semibold text-gray-500">
+              Last Processed
+            </h3>
+            <p className="text-2xl font-bold">
+              Block #:{" "}
+              {currentlyProcessing?.lastProcessedBlock.number.toLocaleString()}
+            </p>
+            <p className="text-sm text-gray-600">
+              Block Time:{" "}
+              {new Date(
+                (currentlyProcessing?.lastProcessedBlock?.timestamp ?? 0) * 1000
+              ).toLocaleString()}
+            </p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h3 className="text-sm font-semibold text-gray-500">
+              Median Processing Time
+            </h3>
+            <p className="text-2xl font-bold">
+              {currentlyProcessing?.medianSecBetweenBlocks.toFixed(3)}
+            </p>
+            <p className="text-sm text-gray-600">sec/block</p>
+          </div>
+        </div>
         <h2 className="text-xl font-bold mb-4">Processed Days</h2>
-        <DebugScatterPlot data={data} />
+        <DebugScatterPlot data={processedDays} />
       </div>
     </main>
   );

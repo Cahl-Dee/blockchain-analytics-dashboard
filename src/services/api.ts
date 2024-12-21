@@ -27,7 +27,7 @@ export async function fetchLineChartData(
   return response.json();
 }
 
-export interface DebugDataPoint {
+export interface DebugDataProcessedDaysPoint {
   date: string;
   lastUpdated: string;
   numBlocks: number;
@@ -36,9 +36,9 @@ export interface DebugDataPoint {
   isSequentialWithNextDay: boolean;
 }
 
-export interface DebugDataResponse {
+export interface DebugDataProcessedDaysResponse {
   chain: string;
-  data: DebugDataPoint[];
+  data: DebugDataProcessedDaysPoint[];
   pagination: {
     offset: number;
     limit: number;
@@ -47,10 +47,35 @@ export interface DebugDataResponse {
   };
 }
 
-export async function fetchDebugData(chain: string = "base"): Promise<any> {
-  const response = await fetch(`/api/debug-data?chain=${chain}`);
+export async function fetchDebugDataProcessedDays(
+  chain: string = "base"
+): Promise<DebugDataProcessedDaysResponse> {
+  const response = await fetch(`/api/debug-data-processed-days?chain=${chain}`);
   if (!response.ok) {
     throw new Error("Failed to fetch debug data");
+  }
+  return response.json();
+}
+
+export interface DebugDataCurrentlyProcesing {
+  chain: string;
+  date: string;
+  blocksProcessed: number;
+  lastProcessedBlock: {
+    number: number;
+    timestamp: number;
+  };
+  medianSecBetweenBlocks: number;
+}
+
+export async function fetchDebugDataCurrentlyProcessing(
+  chain: string = "base"
+): Promise<DebugDataCurrentlyProcesing> {
+  const response = await fetch(
+    `/api/debug-data-currently-processing?chain=${chain}`
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch current metrics");
   }
   return response.json();
 }
