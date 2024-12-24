@@ -36,6 +36,14 @@ export async function GET(request: Request) {
       throw new Error(`API error: ${response.status}`);
     }
 
+    // const responseText = await response.text();
+    // console.log("QuickNode Response:", {
+    //   status: response.status,
+    //   statusText: response.statusText,
+    //   headers: Object.fromEntries(response.headers),
+    //   body: responseText,
+    // });
+
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {

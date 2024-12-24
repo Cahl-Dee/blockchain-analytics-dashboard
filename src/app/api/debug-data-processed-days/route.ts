@@ -19,15 +19,15 @@ export async function GET(request: Request) {
   const requestBody = {
     user_data: {
       chain: chain,
-      days: 30,
+      days: 90,
       method: "getHistoricalMetrics",
     },
   };
 
-  console.log("Request to QuickNode:", {
-    url: API_URL,
-    body: requestBody,
-  });
+  // console.log("Request to QuickNode:", {
+  //   url: API_URL,
+  //   body: requestBody,
+  // });
 
   try {
     const response = await fetch(API_URL, {
@@ -41,12 +41,12 @@ export async function GET(request: Request) {
     });
 
     const responseText = await response.text();
-    console.log("QuickNode Response:", {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers),
-      body: responseText,
-    });
+    // console.log("QuickNode Response:", {
+    //   status: response.status,
+    //   statusText: response.statusText,
+    //   headers: Object.fromEntries(response.headers),
+    //   body: responseText,
+    // });
 
     if (!response.ok) {
       throw new Error(
