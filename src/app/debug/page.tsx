@@ -104,7 +104,7 @@ export default function Home() {
           />
         )}
 
-        {processedDays.length > 0 && (
+        {processedDays?.length > 0 && (
           <>
             <h2 className="text-xl font-bold mb-4">Processed Days</h2>
             <DebugScatterPlot
