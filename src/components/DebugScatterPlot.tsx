@@ -51,6 +51,8 @@ interface DebugDataPoint {
   numProcessedBlocks: number;
   isSequentialWithNextDay: boolean;
   medianBlockProcessingTime: number;
+  firstBlockNum: number;
+  lastBlockNum: number;
 }
 
 interface DebugScatterPlotProps {
@@ -113,6 +115,8 @@ export function DebugScatterPlot({
     numFailedBlocks: point.numFailedBlocks,
     isSequentialWithNextDay: point.isSequentialWithNextDay,
     medianBlockProcessingTime: point.medianBlockProcessingTime,
+    firstBlockNum: point.firstBlockNum,
+    lastBlockNum: point.lastBlockNum,
     size: Math.max(Math.min(point.numBlocks / 1000, 800), 100), // Scale size between 100-800
   }));
 
@@ -179,6 +183,12 @@ export function DebugScatterPlot({
                   <p>
                     Processed At: {new Date(data.lastUpdated).toLocaleString()}
                   </p>
+                  <p>
+                    Median Processing Time:{" "}
+                    {(data.medianBlockProcessingTime / 1000).toFixed(3)}s
+                  </p>
+                  <p>First Block #: {data.firstBlockNum.toLocaleString()}</p>
+                  <p>Last Block #: {data.lastBlockNum.toLocaleString()}</p>
                   <p>Total Blocks: {data.numBlocks.toLocaleString()}</p>
                   <p>Failed Blocks: {data.numFailedBlocks.toLocaleString()}</p>
                   <p>

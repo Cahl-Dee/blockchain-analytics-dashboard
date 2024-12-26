@@ -35,6 +35,8 @@ export interface DebugDataProcessedDaysPoint {
   numProcessedBlocks: number;
   isSequentialWithNextDay: boolean;
   medianBlockProcessingTime: number;
+  firstBlockNum: number;
+  lastBlockNum: number;
 }
 
 export interface DebugDataProcessedDaysResponse {
