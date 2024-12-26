@@ -24,7 +24,7 @@ export default function Home() {
   const [currentlyProcessing, setCurrentlyProcessing] =
     useState<DebugDataCurrentlyProcesing | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [selectedChain, setSelectedChain] = useState("base");
   const [selectedDays, setSelectedDays] = useState(30);
 
@@ -38,7 +38,11 @@ export default function Home() {
       setProcessedDays(processedDaysResp.data);
       setCurrentlyProcessing(currentlyProcessingResp);
     } catch (err) {
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(String(err));
+      }
     } finally {
       setLoading(false);
     }
