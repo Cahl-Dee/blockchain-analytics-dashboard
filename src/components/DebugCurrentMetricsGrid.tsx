@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface MetricsProps {
   currentlyProcessing: {
@@ -19,6 +19,22 @@ export function DebugCurrentMetricsGrid({
   estimatedDailyBlocks,
   historicalMedianProcessingTime,
 }: MetricsProps) {
+  const [showUTC, setShowUTC] = useState(false);
+
+  const formatTimestamp = (timestamp: number) => {
+    if (showUTC) {
+      // Convert to UTC by adding the timezone offset
+      const date = new Date(timestamp * 1000);
+      const utcDate = new Date(
+        date.getTime() + date.getTimezoneOffset() * 60000
+      );
+      return utcDate.toLocaleString();
+    } else {
+      // Show in local timezone
+      return new Date(timestamp * 1000).toLocaleString();
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
       {currentlyProcessing && (
@@ -51,10 +67,17 @@ export function DebugCurrentMetricsGrid({
               {currentlyProcessing.lastProcessedBlock?.number.toLocaleString()}
             </p>
             <p className="text-sm text-gray-600">
-              Block Time (local):{" "}
-              {new Date(
-                currentlyProcessing.lastProcessedBlock?.timestamp * 1000
-              ).toLocaleString()}
+              Block Time (
+              <span
+                className="cursor-pointer hover:text-blue-500 underline"
+                onClick={() => setShowUTC(!showUTC)}
+              >
+                {showUTC ? "UTC" : "local"}
+              </span>
+              ):{" "}
+              {formatTimestamp(
+                currentlyProcessing.lastProcessedBlock?.timestamp
+              )}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">

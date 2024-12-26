@@ -115,7 +115,7 @@ export function DebugScatterPlot({
             dataKey="lastUpdated"
             name="Processed At"
             label={{
-              value: "Processed At",
+              value: "Processed At (local)",
               position: "bottom",
               offset: 40,
             }}
@@ -130,7 +130,7 @@ export function DebugScatterPlot({
             dataKey={(item) => new Date(item.date).getTime()}
             name="Date"
             label={{
-              value: "Date to Process",
+              value: "Date to Process (UTC)",
               angle: -90,
               position: "insideLeft",
               offset: -70,
