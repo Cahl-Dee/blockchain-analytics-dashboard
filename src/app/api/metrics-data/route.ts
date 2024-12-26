@@ -41,12 +41,12 @@ export async function GET(request: Request) {
     });
 
     const responseText = await response.text();
-    console.log("QuickNode Response:", {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers),
-      body: responseText,
-    });
+    // console.log("QuickNode Response:", {
+    //   status: response.status,
+    //   statusText: response.statusText,
+    //   headers: Object.fromEntries(response.headers),
+    //   body: responseText,
+    // });
 
     if (!response.ok) {
       throw new Error(
