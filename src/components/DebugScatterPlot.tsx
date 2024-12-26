@@ -9,6 +9,40 @@ import {
 } from "recharts";
 import { useEffect } from "react";
 
+const getXAxisDateRange = (data: DebugDataPoint[]) => {
+  const timestamps = data.map((d) => new Date(d.lastUpdated).getTime());
+  return {
+    minDate: new Date(Math.min(...timestamps)),
+    maxDate: new Date(Math.max(...timestamps)),
+  };
+};
+
+const getYAxisDateRange = (data: DebugDataPoint[]) => {
+  const dates = data.map((d) => d.date).sort();
+  return {
+    minDate: new Date(dates[0]),
+    maxDate: new Date(dates[dates.length - 1]),
+  };
+};
+
+const generateDateTicks = (startDate: Date, endDate: Date) => {
+  const dates: Date[] = [];
+  const current = new Date(startDate);
+  current.setHours(0, 0, 0, 0);
+  const end = new Date(endDate);
+  end.setHours(23, 59, 59, 999);
+
+  while (current <= end) {
+    dates.push(new Date(current));
+    current.setDate(current.getDate() + 1);
+  }
+
+  return {
+    dateTicks: dates.map((d) => d.toISOString().split("T")[0]),
+    timestampTicks: dates.map((d) => d.getTime()),
+  };
+};
+
 interface DebugDataPoint {
   date: string;
   lastUpdated: string;
@@ -16,34 +50,53 @@ interface DebugDataPoint {
   numFailedBlocks: number;
   numProcessedBlocks: number;
   isSequentialWithNextDay: boolean;
+  medianBlockProcessingTime: number;
 }
 
 interface DebugScatterPlotProps {
   data?: DebugDataPoint[];
   onMedianBlocksCalculated?: (medianBlocks: number) => void;
+  onMedianProcessingTimeCalculated?: (medianTime: number) => void;
 }
 
 export function DebugScatterPlot({
   data = [],
   onMedianBlocksCalculated,
+  onMedianProcessingTimeCalculated,
 }: DebugScatterPlotProps) {
   // Calculate median blocks per day
   useEffect(() => {
     if (data.length > 0) {
+      // Existing blocks calculation
       const blockCounts = data
         .filter((point) => point.numBlocks > 0)
         .map((point) => point.numBlocks)
         .sort((a, b) => a - b);
 
-      const mid = Math.floor(blockCounts.length / 2);
+      const blocksMid = Math.floor(blockCounts.length / 2);
       const medianBlocks =
         blockCounts.length % 2 === 0
-          ? Math.round((blockCounts[mid - 1] + blockCounts[mid]) / 2)
-          : blockCounts[mid];
+          ? Math.round(
+              (blockCounts[blocksMid - 1] + blockCounts[blocksMid]) / 2
+            )
+          : blockCounts[blocksMid];
+
+      // New processing time calculation
+      const processingTimes = data
+        .filter((point) => point.medianBlockProcessingTime > 0)
+        .map((point) => point.medianBlockProcessingTime)
+        .sort((a, b) => a - b);
+
+      const timesMid = Math.floor(processingTimes.length / 2);
+      const medianTime =
+        processingTimes.length % 2 === 0
+          ? (processingTimes[timesMid - 1] + processingTimes[timesMid]) / 2
+          : processingTimes[timesMid];
 
       onMedianBlocksCalculated?.(medianBlocks);
+      onMedianProcessingTimeCalculated?.(medianTime);
     }
-  }, [data, onMedianBlocksCalculated]);
+  }, [data, onMedianBlocksCalculated, onMedianProcessingTimeCalculated]);
 
   if (!data || data.length === 0) {
     return (
@@ -59,27 +112,21 @@ export function DebugScatterPlot({
     numBlocks: point.numBlocks,
     numFailedBlocks: point.numFailedBlocks,
     isSequentialWithNextDay: point.isSequentialWithNextDay,
-    // Add size property based on number of blocks
+    medianBlockProcessingTime: point.medianBlockProcessingTime,
     size: Math.max(Math.min(point.numBlocks / 1000, 800), 100), // Scale size between 100-800
   }));
 
-  // Get min and max dates from lastUpdated timestamps
-  const timestamps = formattedData.map((d) => d.lastUpdated);
-  const minDate = new Date(Math.min(...timestamps));
-  const maxDate = new Date(Math.max(...timestamps));
+  const xAxisRange = getXAxisDateRange(data);
+  const yAxisRange = getYAxisDateRange(data);
 
-  // Generate array of all days between min and max
-  const dailyTicks: number[] = [];
-  const currentDate = new Date(minDate);
-  currentDate.setHours(0, 0, 0, 0); // Start at beginning of day
-
-  while (currentDate <= maxDate) {
-    dailyTicks.push(currentDate.getTime());
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-  // Sort ticks chronologically
-  const tickValues = dailyTicks.sort((a, b) => a - b);
+  const xAxisTicks = generateDateTicks(
+    xAxisRange.minDate,
+    xAxisRange.maxDate
+  ).timestampTicks;
+  const yAxisTicks = generateDateTicks(
+    yAxisRange.minDate,
+    yAxisRange.maxDate
+  ).dateTicks;
 
   const getPointColor = (point: {
     numFailedBlocks: number;
@@ -106,8 +153,8 @@ export function DebugScatterPlot({
             tickFormatter={(unixTime) =>
               new Date(unixTime).toLocaleDateString()
             }
-            ticks={tickValues}
-            domain={[Math.min(...tickValues), Math.max(...tickValues)]}
+            ticks={xAxisTicks}
+            domain={[Math.min(...xAxisTicks), Math.max(...xAxisTicks)]}
           />
           <YAxis
             type="category"
@@ -119,6 +166,7 @@ export function DebugScatterPlot({
               position: "insideLeft",
               offset: -70,
             }}
+            ticks={yAxisTicks}
           />
           <Tooltip
             content={({ active, payload }) => {

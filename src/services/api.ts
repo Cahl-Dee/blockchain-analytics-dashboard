@@ -34,6 +34,7 @@ export interface DebugDataProcessedDaysPoint {
   numFailedBlocks: number;
   numProcessedBlocks: number;
   isSequentialWithNextDay: boolean;
+  medianBlockProcessingTime: number;
 }
 
 export interface DebugDataProcessedDaysResponse {
@@ -68,7 +69,7 @@ export interface DebugDataCurrentlyProcesing {
     number: number;
     timestamp: number;
   };
-  medianSecBetweenBlocks: number;
+  medianBlockProcessingTime: number;
 }
 
 export async function fetchDebugDataCurrentlyProcessing(

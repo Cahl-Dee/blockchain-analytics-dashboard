@@ -31,6 +31,9 @@ export default function Home() {
   const [medianBlocksPerDay, setMedianBlocksPerDay] = useState<number | null>(
     null
   );
+  const [medianProcessingTime, setMedianProcessingTime] = useState<
+    number | null
+  >(null);
 
   const handleDebug = async () => {
     setLoading(true);
@@ -97,6 +100,7 @@ export default function Home() {
           <DebugCurrentMetricsGrid
             currentlyProcessing={currentlyProcessing}
             estimatedDailyBlocks={medianBlocksPerDay}
+            historicalMedianProcessingTime={medianProcessingTime}
           />
         )}
 
@@ -106,6 +110,7 @@ export default function Home() {
             <DebugScatterPlot
               data={processedDays}
               onMedianBlocksCalculated={setMedianBlocksPerDay}
+              onMedianProcessingTimeCalculated={setMedianProcessingTime}
             />
           </>
         )}

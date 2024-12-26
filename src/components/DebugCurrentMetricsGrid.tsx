@@ -8,14 +8,16 @@ interface MetricsProps {
       number: number;
       timestamp: number;
     };
-    medianSecBetweenBlocks: number;
+    medianBlockProcessingTime: number;
   } | null;
   estimatedDailyBlocks?: number | null;
+  historicalMedianProcessingTime?: number | null;
 }
 
 export function DebugCurrentMetricsGrid({
   currentlyProcessing,
   estimatedDailyBlocks,
+  historicalMedianProcessingTime,
 }: MetricsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -57,12 +59,21 @@ export function DebugCurrentMetricsGrid({
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
             <h3 className="text-sm font-semibold text-gray-500">
-              Median Processing Time
+              Median Sec Between Blocks Processed
             </h3>
             <p className="text-2xl font-bold">
-              {currentlyProcessing.medianSecBetweenBlocks?.toFixed(3)}
-            </p>
-            <p className="text-sm text-gray-600">sec/block</p>
+              Currently processing day:{" "}
+              {(currentlyProcessing.medianBlockProcessingTime / 1000).toFixed(
+                3
+              )}
+            </p>{" "}
+            {historicalMedianProcessingTime != null &&
+              !isNaN(historicalMedianProcessingTime) && (
+                <p className="text-sm text-gray-600">
+                  Previously Processed Days:{" "}
+                  {(historicalMedianProcessingTime / 1000).toFixed(3)}
+                </p>
+              )}
           </div>
         </>
       )}
