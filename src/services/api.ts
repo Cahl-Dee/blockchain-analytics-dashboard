@@ -48,9 +48,12 @@ export interface DebugDataProcessedDaysResponse {
 }
 
 export async function fetchDebugDataProcessedDays(
-  chain: string = "base"
+  chain: string,
+  days: number
 ): Promise<DebugDataProcessedDaysResponse> {
-  const response = await fetch(`/api/debug-data-processed-days?chain=${chain}`);
+  const response = await fetch(
+    `/api/debug-data-processed-days?chain=${chain}&days=${days}`
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch debug data");
   }

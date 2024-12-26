@@ -5,7 +5,7 @@ const API_URL = `https://api.quicknode.com/functions/rest/v1/functions/${FUNCTIO
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const chain = searchParams.get("chain") || "base";
+  const chain = searchParams.get("chain");
   const apiKey = process.env.QUICKNODE_API_KEY;
 
   if (!apiKey) {

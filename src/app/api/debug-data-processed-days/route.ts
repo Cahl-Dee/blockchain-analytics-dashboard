@@ -5,8 +5,22 @@ const API_URL = `https://api.quicknode.com/functions/rest/v1/functions/${FUNCTIO
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const chain = searchParams.get("chain") || "base";
+
+  const chainParam = searchParams.get("chain");
+  if (chainParam === null) {
+    throw new Error("Missing 'chain' query parameter");
+  }
+  const chain = chainParam;
+
+  const daysParam = searchParams.get("days");
+  if (daysParam === null) {
+    throw new Error("Missing 'days' query parameter");
+  }
+  const days = parseInt(daysParam);
+
   const apiKey = process.env.QUICKNODE_API_KEY;
+
+  console.log("GET request:", { chain, days });
 
   if (!apiKey) {
     console.error("Missing QUICKNODE_API_KEY");
@@ -19,7 +33,7 @@ export async function GET(request: Request) {
   const requestBody = {
     user_data: {
       chain: chain,
-      days: 90,
+      days: days,
       method: "getHistoricalMetrics",
     },
   };
@@ -41,12 +55,12 @@ export async function GET(request: Request) {
     });
 
     const responseText = await response.text();
-    // console.log("QuickNode Response:", {
-    //   status: response.status,
-    //   statusText: response.statusText,
-    //   headers: Object.fromEntries(response.headers),
-    //   body: responseText,
-    // });
+    console.log("QuickNode Response:", {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers),
+      body: responseText,
+    });
 
     if (!response.ok) {
       throw new Error(
