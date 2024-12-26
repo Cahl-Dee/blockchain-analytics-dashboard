@@ -34,7 +34,7 @@ export async function GET(request: Request) {
     user_data: {
       chain: chain,
       days: days,
-      method: "getHistoricalMetrics",
+      method: "getProcessedDaysStats",
     },
   };
 

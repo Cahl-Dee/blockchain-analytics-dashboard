@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   const requestBody = {
     user_data: {
       chain: chain,
-      method: "getCurrentMetrics",
+      method: "getCurrentlyProcessingStats",
     },
   };
 
