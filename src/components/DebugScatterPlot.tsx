@@ -9,40 +9,6 @@ import {
 } from "recharts";
 import { useEffect } from "react";
 
-const getXAxisDateRange = (data: DebugDataPoint[]) => {
-  const timestamps = data.map((d) => new Date(d.lastUpdated).getTime());
-  return {
-    minDate: new Date(Math.min(...timestamps)),
-    maxDate: new Date(Math.max(...timestamps)),
-  };
-};
-
-const getYAxisDateRange = (data: DebugDataPoint[]) => {
-  const dates = data.map((d) => d.date).sort();
-  return {
-    minDate: new Date(dates[0]),
-    maxDate: new Date(dates[dates.length - 1]),
-  };
-};
-
-const generateDateTicks = (startDate: Date, endDate: Date) => {
-  const dates: Date[] = [];
-  const current = new Date(startDate);
-  current.setHours(0, 0, 0, 0);
-  const end = new Date(endDate);
-  end.setHours(23, 59, 59, 999);
-
-  while (current <= end) {
-    dates.push(new Date(current));
-    current.setDate(current.getDate() + 1);
-  }
-
-  return {
-    dateTicks: dates.map((d) => d.toISOString().split("T")[0]),
-    timestampTicks: dates.map((d) => d.getTime()),
-  };
-};
-
 interface DebugDataPoint {
   date: string;
   lastUpdated: string;
@@ -120,17 +86,16 @@ export function DebugScatterPlot({
     size: Math.max(Math.min(point.numBlocks / 1000, 800), 100), // Scale size between 100-800
   }));
 
-  const xAxisRange = getXAxisDateRange(data);
-  const yAxisRange = getYAxisDateRange(data);
-
-  const xAxisTicks = generateDateTicks(
-    xAxisRange.minDate,
-    xAxisRange.maxDate
-  ).timestampTicks;
+  const yDates = data.map((d) => d.date).sort();
   const yAxisTicks = generateDateTicks(
-    yAxisRange.minDate,
-    yAxisRange.maxDate
-  ).dateTicks;
+    new Date(yDates[0]),
+    new Date(yDates[yDates.length - 1])
+  );
+  const xTimestamps = data.map((d) => new Date(d.lastUpdated).getTime());
+  const xAxisTicks = generateDateTicks(
+    new Date(Math.min(...xTimestamps)),
+    new Date(Math.max(...xTimestamps))
+  );
 
   const getPointColor = (point: {
     numFailedBlocks: number;
@@ -154,15 +119,15 @@ export function DebugScatterPlot({
               position: "bottom",
               offset: 40,
             }}
-            tickFormatter={(unixTime) =>
-              new Date(unixTime).toLocaleDateString()
-            }
             ticks={xAxisTicks}
-            domain={[Math.min(...xAxisTicks), Math.max(...xAxisTicks)]}
+            tickFormatter={(timestamp) =>
+              new Date(timestamp).toLocaleDateString()
+            }
+            domain={["dataMin", "dataMax"]}
           />
           <YAxis
-            type="category"
-            dataKey="date"
+            type="number"
+            dataKey={(item) => new Date(item.date).getTime()}
             name="Date"
             label={{
               value: "Date to Process",
@@ -171,6 +136,14 @@ export function DebugScatterPlot({
               offset: -70,
             }}
             ticks={yAxisTicks}
+            tickFormatter={(timestamp) => {
+              const date = new Date(timestamp);
+              return `${
+                date.getUTCMonth() + 1
+              }/${date.getUTCDate()}/${date.getUTCFullYear()}`;
+            }}
+            domain={["dataMin", "dataMax"]}
+            padding={{ top: 20, bottom: 20 }}
           />
           <Tooltip
             content={({ active, payload }) => {
@@ -208,3 +181,18 @@ export function DebugScatterPlot({
     </div>
   );
 }
+
+const generateDateTicks = (startDate: Date, endDate: Date) => {
+  const dates: Date[] = [];
+  const current = new Date(startDate);
+  current.setHours(0, 0, 0, 0);
+  const end = new Date(endDate);
+  end.setHours(23, 59, 59, 999);
+
+  while (current <= end) {
+    dates.push(new Date(current));
+    current.setDate(current.getDate() + 1);
+  }
+
+  return dates.map((d) => d.getTime());
+};
