@@ -22,7 +22,7 @@ export function DebugCurrentMetricsGrid({ currentlyProcessing }: MetricsProps) {
               Currently Processing
             </h3>
             <p className="text-2xl font-bold">
-              Date: {currentlyProcessing.date}
+              Date (UTC): {currentlyProcessing.date}
             </p>
             <p className="text-sm text-gray-600">
               Completed Blocks:{" "}
@@ -38,7 +38,7 @@ export function DebugCurrentMetricsGrid({ currentlyProcessing }: MetricsProps) {
               {currentlyProcessing.lastProcessedBlock?.number.toLocaleString()}
             </p>
             <p className="text-sm text-gray-600">
-              Block Time:{" "}
+              Block Time (local):{" "}
               {new Date(
                 currentlyProcessing.lastProcessedBlock?.timestamp * 1000
               ).toLocaleString()}
