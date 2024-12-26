@@ -20,8 +20,6 @@ export async function GET(request: Request) {
 
   const apiKey = process.env.QUICKNODE_API_KEY;
 
-  console.log("GET request:", { chain, days });
-
   if (!apiKey) {
     console.error("Missing QUICKNODE_API_KEY");
     return NextResponse.json(
@@ -55,12 +53,12 @@ export async function GET(request: Request) {
     });
 
     const responseText = await response.text();
-    console.log("QuickNode Response:", {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers),
-      body: responseText,
-    });
+    // console.log("QuickNode Response:", {
+    //   status: response.status,
+    //   statusText: response.statusText,
+    //   headers: Object.fromEntries(response.headers),
+    //   body: responseText,
+    // });
 
     if (!response.ok) {
       throw new Error(
