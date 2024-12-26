@@ -7,6 +7,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { useEffect } from "react";
 
 interface DebugDataPoint {
   date: string;
@@ -19,9 +20,31 @@ interface DebugDataPoint {
 
 interface DebugScatterPlotProps {
   data?: DebugDataPoint[];
+  onMedianBlocksCalculated?: (medianBlocks: number) => void;
 }
 
-export function DebugScatterPlot({ data = [] }: DebugScatterPlotProps) {
+export function DebugScatterPlot({
+  data = [],
+  onMedianBlocksCalculated,
+}: DebugScatterPlotProps) {
+  // Calculate median blocks per day
+  useEffect(() => {
+    if (data.length > 0) {
+      const blockCounts = data
+        .filter((point) => point.numBlocks > 0)
+        .map((point) => point.numBlocks)
+        .sort((a, b) => a - b);
+
+      const mid = Math.floor(blockCounts.length / 2);
+      const medianBlocks =
+        blockCounts.length % 2 === 0
+          ? Math.round((blockCounts[mid - 1] + blockCounts[mid]) / 2)
+          : blockCounts[mid];
+
+      onMedianBlocksCalculated?.(medianBlocks);
+    }
+  }, [data, onMedianBlocksCalculated]);
+
   if (!data || data.length === 0) {
     return (
       <div className="w-full h-[800px] bg-white p-4 rounded-lg shadow flex items-center justify-center">

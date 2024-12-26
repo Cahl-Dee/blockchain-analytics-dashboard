@@ -28,6 +28,9 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [selectedChain, setSelectedChain] = useState("base");
   const [selectedDays, setSelectedDays] = useState(30);
+  const [medianBlocksPerDay, setMedianBlocksPerDay] = useState<number | null>(
+    null
+  );
 
   const handleDebug = async () => {
     setLoading(true);
@@ -91,13 +94,19 @@ export default function Home() {
         {error && <div className="text-red-500 mb-4">Error: {error}</div>}
 
         {currentlyProcessing && (
-          <DebugCurrentMetricsGrid currentlyProcessing={currentlyProcessing} />
+          <DebugCurrentMetricsGrid
+            currentlyProcessing={currentlyProcessing}
+            estimatedDailyBlocks={medianBlocksPerDay}
+          />
         )}
 
         {processedDays.length > 0 && (
           <>
             <h2 className="text-xl font-bold mb-4">Processed Days</h2>
-            <DebugScatterPlot data={processedDays} />
+            <DebugScatterPlot
+              data={processedDays}
+              onMedianBlocksCalculated={setMedianBlocksPerDay}
+            />
           </>
         )}
       </div>

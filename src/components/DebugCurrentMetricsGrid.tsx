@@ -10,9 +10,13 @@ interface MetricsProps {
     };
     medianSecBetweenBlocks: number;
   } | null;
+  estimatedDailyBlocks?: number | null;
 }
 
-export function DebugCurrentMetricsGrid({ currentlyProcessing }: MetricsProps) {
+export function DebugCurrentMetricsGrid({
+  currentlyProcessing,
+  estimatedDailyBlocks,
+}: MetricsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
       {currentlyProcessing && (
@@ -27,6 +31,13 @@ export function DebugCurrentMetricsGrid({ currentlyProcessing }: MetricsProps) {
             <p className="text-sm text-gray-600">
               Completed Blocks:{" "}
               {currentlyProcessing.blocksProcessed?.toLocaleString()}
+              {currentlyProcessing.blocksProcessed && estimatedDailyBlocks
+                ? ` (est: ${(
+                    (currentlyProcessing.blocksProcessed /
+                      estimatedDailyBlocks) *
+                    100
+                  ).toFixed(2)}%)`
+                : ""}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
