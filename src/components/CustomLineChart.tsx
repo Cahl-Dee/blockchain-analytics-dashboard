@@ -289,19 +289,21 @@ export const CustomLineChart = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500" />
+      <div className="flex items-center justify-center h-96 dark:bg-gray-800">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy-500 dark:border-blue-400" />
       </div>
     );
   }
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-lg">
+    <div className="w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <ErrorBoundary>
         {error ? (
-          <div className="p-4 border border-red-500 rounded bg-red-50">
-            <h3 className="text-red-700 font-bold">Error loading chart</h3>
-            <p className="text-red-600">{error.message}</p>
+          <div className="p-4 border border-red-500 rounded bg-red-50 dark:bg-red-900/20 dark:border-red-700">
+            <h3 className="text-red-700 dark:text-red-400 font-bold">
+              Error loading chart
+            </h3>
+            <p className="text-red-600 dark:text-red-300">{error.message}</p>
           </div>
         ) : (
           <div className="p-4">

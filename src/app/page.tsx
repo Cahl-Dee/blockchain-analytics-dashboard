@@ -28,8 +28,8 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen p-4 md:p-8 bg-gray-100">
-      <div className="max-w-[1800px] mx-auto px-4">
+    <main className="min-h-screen p-4 md:p-8 bg-gray-100 dark:bg-navy-950">
+      <div className="max-w-[1800px] mx-auto px-4 mb-8">
         <h1 className="text-3xl font-bold mb-8">Chain Metrics Dashboard</h1>
         <Controls
           enabledChains={enabledChains}
