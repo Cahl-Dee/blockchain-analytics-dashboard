@@ -46,7 +46,7 @@ const formatValue = (value: number): string => {
 
   // Format large numbers with commas
   return value.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
+    minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   });
 };
@@ -128,10 +128,71 @@ const ChartTemplate = ({
         <XAxis dataKey="formattedDate" tickFormatter={formatDateDisplay} />
         <YAxis tickFormatter={formatYAxisTick} />
         <Tooltip
-          labelFormatter={formatDateDisplay}
-          formatter={(value: number, name: string) => {
-            const chain = enabledChains.find((c) => c.id === name);
-            return [formatValue(value), chain?.name || name];
+          content={({ payload, label }) => {
+            if (!payload?.length) return null;
+
+            // Find smallest absolute value
+            const smallestAbs = Math.min(
+              ...payload.map((item) => Math.abs(item.value as number))
+            );
+
+            // Determine format based on smallest value
+            const getFormat = () => {
+              if (smallestAbs < 0.01) return (n: number) => n.toFixed(6);
+              if (smallestAbs < 1000) return (n: number) => n.toFixed(4);
+              return (n: number) =>
+                n.toLocaleString("en-US", {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                });
+            };
+
+            const formatFunc = getFormat();
+            const sortedPayload = [...payload].sort(
+              (a, b) => (b.value as number) - (a.value as number)
+            );
+
+            return (
+              <div
+                style={{
+                  padding: "8px",
+                  borderRadius: "4px",
+                  backgroundColor: "white",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <div style={{ padding: "2px 0", margin: "0" }}>
+                  {formatDateDisplay(label)}
+                </div>
+                {sortedPayload.map(({ value, name, color }) => {
+                  const chain = enabledChains.find((c) => c.id === name);
+                  return (
+                    <div
+                      key={name}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        width: "240px",
+                        gap: "8px",
+                        alignItems: "center",
+                        margin: "0",
+                      }}
+                    >
+                      <span
+                        style={{ flex: "1 1 150px", textAlign: "right", color }}
+                      >
+                        {(value as number) === 0
+                          ? "0"
+                          : formatFunc(value as number)}
+                      </span>
+                      <span style={{ flex: "0 0 120px", color }}>
+                        {chain?.name || name}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            );
           }}
         />
         <Legend
