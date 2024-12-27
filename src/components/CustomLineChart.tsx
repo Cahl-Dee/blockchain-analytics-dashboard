@@ -31,26 +31,6 @@ interface LineChartProps {
   selectedDate: string;
 }
 
-const formatValue = (value: number): string => {
-  if (value === 0) return "0";
-
-  // Format small numbers
-  if (Math.abs(value) < 0.01) {
-    return value.toFixed(6);
-  }
-
-  // Format medium numbers
-  if (Math.abs(value) < 1000) {
-    return value.toFixed(4);
-  }
-
-  // Format large numbers with commas
-  return value.toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-};
-
 const formatYAxisTick = (value: number): string => {
   if (value === 0) return "0";
 
@@ -325,11 +305,7 @@ export const CustomLineChart = ({
           </div>
         ) : (
           <div className="p-4">
-            <ChartTemplate
-              data={data}
-              enabledChains={enabledChains}
-              metricId={metricId}
-            />
+            <ChartTemplate data={data} enabledChains={enabledChains} />
           </div>
         )}
       </ErrorBoundary>
