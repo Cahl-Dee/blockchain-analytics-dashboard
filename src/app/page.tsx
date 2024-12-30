@@ -2,15 +2,37 @@
 
 import { CustomLineChart } from "@/components/CustomLineChart";
 import { Controls } from "@/components/Controls";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { metrics } from "@/config/metrics";
 import { chains } from "@/config/chains";
 import { useState } from "react";
 
 export default function Home() {
-  const [enabledChains, setEnabledChains] = useState(
-    chains.filter((chain) => chain.enabled)
-  );
+  // Initialize state with localStorage value if available, otherwise use default
+  const [enabledChains, setEnabledChains] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("enabledChains");
+      if (saved) {
+        const parsedChains = JSON.parse(saved);
+        interface SavedChain {
+          id: string;
+        }
+
+        return parsedChains
+          .map((savedChain: SavedChain): Chain | undefined =>
+            chains.find((c: Chain): boolean => c.id === savedChain.id)
+          )
+          .filter((chain: Chain | undefined): chain is Chain => Boolean(chain));
+      }
+    }
+    return chains.filter((chain) => chain.enabled);
+  });
+
+  // Save to localStorage whenever enabledChains changes
+  useEffect(() => {
+    localStorage.setItem("enabledChains", JSON.stringify(enabledChains));
+  }, [enabledChains]);
+
   const [selectedDays, setSelectedDays] = useState(90);
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -20,9 +42,9 @@ export default function Home() {
     const chain = chains.find((c) => c.id === chainId);
     if (!chain) return;
 
-    setEnabledChains((current) =>
-      current.some((c) => c.id === chainId)
-        ? current.filter((c) => c.id !== chainId)
+    setEnabledChains((current: Chain[]): Chain[] =>
+      current.some((c: Chain): boolean => c.id === chainId)
+        ? current.filter((c: Chain): boolean => c.id !== chainId)
         : [...current, chain]
     );
   };
@@ -57,4 +79,9 @@ export default function Home() {
       </div>
     </main>
   );
+}
+interface Chain {
+  id: string;
+  name: string;
+  enabled: boolean;
 }
