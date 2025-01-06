@@ -24,10 +24,10 @@ export async function GET(request: Request) {
     },
   };
 
-  console.log("Request to QuickNode:", {
-    url: API_URL,
-    body: requestBody,
-  });
+  // console.log("Request to QuickNode:", {
+  //   url: API_URL,
+  //   body: requestBody,
+  // });
 
   try {
     const response = await fetch(API_URL, {
