@@ -182,8 +182,10 @@ const ChartTemplate = ({
           formatter={(value, entry) => (
             <span
               style={{
-                color: hiddenChains.has(entry.dataKey) ? "#999" : entry.color,
-                opacity: hiddenChains.has(entry.dataKey) ? "0.4" : "1",
+                color: hiddenChains.has(entry.payload?.value)
+                  ? "#999"
+                  : entry.color,
+                opacity: hiddenChains.has(entry.payload?.value) ? "0.4" : "1",
                 cursor: "pointer",
               }}
             >
