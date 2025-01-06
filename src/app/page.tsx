@@ -6,31 +6,46 @@ import { Suspense, useEffect } from "react";
 import { metrics } from "@/config/metrics";
 import { chains } from "@/config/chains";
 import { useState } from "react";
+import { Chain } from "@/config/chains";
 
 export default function Home() {
-  // Initialize state with localStorage value if available, otherwise use default
-  const [enabledChains, setEnabledChains] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("enabledChains");
-      if (saved) {
-        const parsedChains = JSON.parse(saved);
-        interface SavedChain {
-          id: string;
-        }
+  const [enabledChains, setEnabledChains] = useState<Chain[]>(() => {
+    if (typeof window === "undefined") {
+      return chains.filter((chain) => chain.enabled);
+    }
 
-        return parsedChains
-          .map((savedChain: SavedChain): Chain | undefined =>
-            chains.find((c: Chain): boolean => c.id === savedChain.id)
-          )
-          .filter((chain: Chain | undefined): chain is Chain => Boolean(chain));
+    const saved = localStorage.getItem("enabledChains");
+    if (saved) {
+      try {
+        const parsedChains = JSON.parse(saved);
+        if (Array.isArray(parsedChains) && parsedChains.length > 0) {
+          const validChains = parsedChains
+            .map((savedChain: { id: string }) =>
+              chains.find((c) => c.id === savedChain.id)
+            )
+            .filter((chain: Chain | undefined): chain is Chain =>
+              Boolean(chain)
+            );
+
+          if (validChains.length > 0) {
+            return validChains;
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing chain state:", error);
       }
     }
+
     return chains.filter((chain) => chain.enabled);
   });
 
-  // Save to localStorage whenever enabledChains changes
   useEffect(() => {
-    localStorage.setItem("enabledChains", JSON.stringify(enabledChains));
+    const savedChains = JSON.stringify(enabledChains);
+    const currentSaved = localStorage.getItem("enabledChains");
+
+    if (currentSaved !== savedChains) {
+      localStorage.setItem("enabledChains", savedChains);
+    }
   }, [enabledChains]);
 
   const [selectedDays, setSelectedDays] = useState(90);
@@ -42,9 +57,9 @@ export default function Home() {
     const chain = chains.find((c) => c.id === chainId);
     if (!chain) return;
 
-    setEnabledChains((current: Chain[]): Chain[] =>
-      current.some((c: Chain): boolean => c.id === chainId)
-        ? current.filter((c: Chain): boolean => c.id !== chainId)
+    setEnabledChains((current: Chain[]) =>
+      current.some((c) => c.id === chainId)
+        ? current.filter((c) => c.id !== chainId)
         : [...current, chain]
     );
   };
@@ -79,9 +94,4 @@ export default function Home() {
       </div>
     </main>
   );
-}
-interface Chain {
-  id: string;
-  name: string;
-  enabled: boolean;
 }

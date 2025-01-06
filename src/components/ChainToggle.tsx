@@ -16,7 +16,7 @@ export const ChainToggle = ({ chain, enabled, onToggle }: ChainToggleProps) => (
       transition-colors
       ${enabled ? "text-white" : "bg-gray-200 text-gray-600 hover:bg-gray-300"}
     `}
-    style={enabled ? { backgroundColor: chain.color } : {}}
+    style={enabled ? { backgroundColor: chain.color } : undefined}
   >
     {chain.name}
   </button>

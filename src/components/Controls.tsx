@@ -22,14 +22,17 @@ export const Controls = ({
 }: ControlsProps) => (
   <div className="flex flex-wrap mb-8 gap-4 p-4 bg-white rounded-lg shadow-lg">
     <div className="flex items-center space-x-4">
-      {chains.map((chain) => (
-        <ChainToggle
-          key={chain.id}
-          chain={chain}
-          enabled={enabledChains.some((c) => c.id === chain.id)}
-          onToggle={onToggleChain}
-        />
-      ))}
+      {chains.map((chain) => {
+        const isEnabled = enabledChains.some((c) => c.id === chain.id);
+        return (
+          <ChainToggle
+            key={chain.id}
+            chain={chain}
+            enabled={isEnabled}
+            onToggle={onToggleChain}
+          />
+        );
+      })}
     </div>
     <div className="flex items-center space-x-4">
       <select
